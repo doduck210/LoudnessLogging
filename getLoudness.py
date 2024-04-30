@@ -6,5 +6,3 @@ def getLoudness(file):
     meter = pyln.Meter(rate)
     loudness = meter.integrated_loudness(data)
     return loudness
-
-print(getLoudness("./a.wav"))

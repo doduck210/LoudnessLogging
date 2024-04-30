@@ -1,10 +1,6 @@
 import subprocess
 import os
 
-def tsToWav(tsFile,wavFile):
-    command = ['ffmpeg', '-i', tsFile, '-vn', '-acodec', 'pcm_s16le', '-ar', '44100', '-ac', '2', wavFile]
-    subprocess.run(command,check=True)
-
 # 폴더 내의 모든 mp4 파일을 찾아서 리스트로 반환하는 함수
 def find_mp4_files(directory):
     return [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith('.mp4')]
