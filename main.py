@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import getLoudness
 import videoToWav
 import openpyxl
+import csv
 import os
 
 # xml (편성표) 파일 열기
@@ -51,13 +52,18 @@ for EventInfo in EventList:
 
     # get Loudness
     dd=Duration.total_seconds()
-    lufs = getLoudness.splitAndLoud(concatenated_wav,ss,dd)
+    lufs , mlkfs= getLoudness.splitAndLoud(concatenated_wav,ss,dd)
     print(EventIndex, ' / ', EventListSize, ' : ' ,lufs)
     ss+=dd
 
     # writing to excel
     row=[StartTimeStr,EndTimeStr,DurationStr,lufs,EventTitle,PGMID]
     sheet.append(row)
+    # momentary lkfs saving
+    with open('data/'+startDate+"/mlkfs"+StartTimeStr.replace(":","-")+".csv","w",newline="") as file:
+        writer = csv.writer(file)
+        for item in mlkfs:
+            writer.writerow([item])
     
 excel.save("./data/Loudness_Report_"+startDate+".xlsx")
 #os.remove(concatenated_wav)

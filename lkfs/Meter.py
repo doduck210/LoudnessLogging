@@ -85,7 +85,7 @@ class Meter(object):
             warnings.simplefilter("ignore", category=RuntimeWarning)
             # loudness for each jth block (see eq. 4)
             l = [-0.691 + 10.0 * np.log10(np.sum([G[i] * z[i,j] for i in range(numChannels)])) for j in j_range]
-            print(l)
+            mlkfs=l
 
         # find gating block indices above absolute threshold
         J_g = [j for j,l_j in enumerate(l) if l_j >= Gamma_a]
@@ -108,7 +108,7 @@ class Meter(object):
         with np.errstate(divide='ignore'):
             LUFS = -0.691 + 10.0 * np.log10(np.sum([G[i] * z_avg_gated[i] for i in range(numChannels)]))
 
-        return LUFS
+        return LUFS, mlkfs
 
     @property
     def filter_class(self):
