@@ -11,7 +11,7 @@ Output :
 this includes : StartTime, EndTime, Duration, LKFS, ProgramName, PGMID   
 
 Requirements :
-* pyloudnorm, openpyxl, ElementTree, soundfile
+* openpyxl, ElementTree, soundfile
 
 
 ## Background
@@ -21,4 +21,6 @@ Requirements :
 
 이에따라 하루단위로 작일 편성표를 기준으로 Program별 Loudness를 측정하고 제출 가능한 문서형태로 값을 출력하는 프로그램 작성하게 됌
        
-     
+Used and Edited LKFS calc algorithm from [pyloudnrom](https://github.com/csteinmetz1/pyloudnorm)    
+    
+    

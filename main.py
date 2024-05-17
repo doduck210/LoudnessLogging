@@ -26,10 +26,13 @@ nextDate=videoToWav.convert_date_format(nextDate)
 video_files = videoToWav.find_mp4_files('./data/' + startDate)
 video_files += videoToWav.find_mp4_files('./data/' + nextDate)
 concatenated_wav = './data/tmp' + startDate + '.wav'
-videoToWav.concatenate_videos(video_files, concatenated_wav)
+#videoToWav.concatenate_videos(video_files, concatenated_wav)
 
 # 편성정보 프로그램별로 계산 및 엑셀에 기록
-ss=0
+sHours, sMinutes, sSeconds = map(int, EventList[0][2].text[:-3].split(":"))
+ss=timedelta(hours=sHours,minutes=sMinutes,seconds=sSeconds).total_seconds() + 1
+
+# 편성정보 프로그램별로 계산 및 엑셀에 기록
 for EventInfo in EventList:
     EventIndex = EventInfo[0].text
     OnAirDate = EventInfo[1].text # DD/MM/YYYY
@@ -57,4 +60,4 @@ for EventInfo in EventList:
     sheet.append(row)
     
 excel.save("./data/Loudness_Report_"+startDate+".xlsx")
-os.remove(concatenated_wav)
+#os.remove(concatenated_wav)
