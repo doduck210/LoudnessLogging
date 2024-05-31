@@ -6,15 +6,22 @@ import openpyxl
 import csv
 import os
 
+#날짜 구하기
+today=datetime.now()
+yesterday=today-timedelta(days=1)
+todayStr=today.strftime('%Y%m%d')
+yesterdayStr=yesterday.strftime('%Y%m%d')
+
 # xml (편성표) 파일 열기
-file = ET.parse('./data/mediaproxy_xml/20240304.xml')
+parser=ET.XMLParser(encoding="utf-8")
+file = ET.parse('/mnt/raid/schedule/'+yesterdayStr+'.xml',parser=parser)
 EventList = file.getroot()
 EventListSize = len(EventList)
 
 # Excel Report File
 excel = openpyxl.Workbook()
 sheet = excel.active
-columns = ["Start Time","End Time","Duration","ILKFS","Title","ID"]
+columns = ["Start Time","End Time","Duration","ILKFS","Title","ID","DescriptiveLUFS"]
 sheet.append(columns)
 
 # 날짜와 다음날짜 구하기
@@ -24,14 +31,15 @@ startDate=videoToWav.convert_date_format(startDate)
 nextDate=videoToWav.convert_date_format(nextDate)
 
 ##해당날짜, 다음날짜 파일들 합치기
-video_files = videoToWav.find_mp4_files('./data/' + startDate)
-video_files += videoToWav.find_mp4_files('./data/' + nextDate)
+video_files = videoToWav.find_ts_files('/mnt/raid/video/'+startDate+'/SBS-HD-NAMSAN/')
+video_files += videoToWav.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
 concatenated_wav = './data/tmp' + startDate + '.wav'
-#videoToWav.concatenate_videos(video_files, concatenated_wav)
+videoToWav.concatenate_videos(video_files, concatenated_wav)
 
 # 편성정보 프로그램별로 계산 및 엑셀에 기록
 sHours, sMinutes, sSeconds = map(int, EventList[0][2].text[:-3].split(":"))
 ss=timedelta(hours=sHours,minutes=sMinutes,seconds=sSeconds).total_seconds() + 1
+os.mkdir("./data/"+startDate)
 
 # 편성정보 프로그램별로 계산 및 엑셀에 기록
 for EventInfo in EventList:
@@ -41,6 +49,7 @@ for EventInfo in EventList:
     DurationStr = EventInfo[3].text[:-3] # hh:mm:ss
     PGMID = EventInfo[4].text
     EventTitle = EventInfo[5].text
+    descriptive = EventInfo[6].text
 
     # calculate End Time
     timedateStr = f"{OnAirDate} {StartTimeStr}"
@@ -55,6 +64,11 @@ for EventInfo in EventList:
     lufs , mlkfs= getLoudness.splitAndLoud(concatenated_wav,ss,dd)
     print(EventIndex, ' / ', EventListSize, ' : ' ,lufs)
     ss+=dd
+    dlufs=""
+    if descriptive == "True":
+        filepath="/mnt/raid/audio/"+startDate+"/secondary/secondary_"+StartTimeStr.replace(":","-")+".wav"
+        dlufs, dmlkfs = getLoudness.getLoudness(filepath)
+        print("descriptive : ",dlufs)
 
     # writing to excel
     row=[StartTimeStr,EndTimeStr,DurationStr,lufs,EventTitle,PGMID]

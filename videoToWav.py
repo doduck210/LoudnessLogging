@@ -3,8 +3,8 @@ import os
 from datetime import datetime, timedelta
 
 # 폴더 내의 모든 mp4 파일을 찾아서 리스트로 반환
-def find_mp4_files(directory):
-    return [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith('.mp4')]
+def find_ts_files(directory):
+    return [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith('.ts')]
 
 def get_next_day(date_text):
     # 'dd/mm/yyyy' 형식의 날짜를 datetime 객체로 변환
@@ -27,7 +27,7 @@ def convert_date_format(date_str):
 
 # MP4를 wav파일로 바꾸는 함수
 def convert_mp4_to_wav(input_mp4, output_wav):
-    subprocess.run(['ffmpeg', '-i', input_mp4, '-vn', '-acodec', 'pcm_s16le', '-ar', '44100', '-ac', '2', output_wav], check=True)
+    subprocess.run(['ffmpeg', '-i', input_mp4, '-vn', '-acodec', 'pcm_s16le', output_wav], check=True)
 
 # MP4 파일들을 합치는 함수
 def concatenate_videos(video_files, output_file):
@@ -39,7 +39,6 @@ def concatenate_videos(video_files, output_file):
     
     subprocess.run(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', tmp_file, '-vn','-c:a', 'pcm_s16le', output_file], check=True)
     os.remove(tmp_file)
-
 
 def split_wav_and_save(input_wav, start_time, duration, output_folder):
     # 출력 파일 이름 형성
