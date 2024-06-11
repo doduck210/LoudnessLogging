@@ -39,7 +39,8 @@ videoToWav.concatenate_videos(video_files, concatenated_wav)
 # 시작시간 구하기
 sHours, sMinutes, sSeconds = map(int, EventList[0][2].text[:-3].split(":"))
 ss=timedelta(hours=sHours-4,minutes=sMinutes,seconds=sSeconds).total_seconds() + 1
-os.mkdir("./data/"+startDate)
+if not os.path.exists("./data/"+startDate):
+    os.makedirs("./data/"+startDate)
 
 # 편성정보 프로그램별로 계산 및 엑셀에 기록
 for EventInfo in EventList:
@@ -64,20 +65,20 @@ for EventInfo in EventList:
     lufs , mlkfs= getLoudness.splitAndLoud(concatenated_wav,ss,dd)
     print(EventIndex, ' / ', EventListSize, ' : ' ,lufs)
     ss+=dd
-    dlufs=""
-    if descriptive == "True":
-        filepath="/mnt/raid/audio/"+startDate+"/secondary/sec ondary_"+StartTimeStr.replace(":","-")+".wav"
-        dlufs, dmlkfs = getLoudness.getLoudness(filepath)
-        print("descriptive : ",dlufs)
+    #dlufs=""
+    #if descriptive == "True":
+    #    filepath="/mnt/raid/audio/"+startDate+"/secondary/secondary_"+StartTimeStr.replace(":","-")+".wav"
+    #    dlufs, dmlkfs = getLoudness.getLoudness(filepath)
+    #    print("descriptive : ",dlufs)
 
     # writing to excel
     row=[StartTimeStr,EndTimeStr,DurationStr,lufs,EventTitle,PGMID]
     sheet.append(row)
     # momentary lkfs saving
-    with open('data/'+startDate+"/mlkfs"+StartTimeStr.replace(":","-")+".csv","w",newline="") as file:
+    with open('/mnt/raid/data/'+startDate+"/mlkfs"+StartTimeStr.replace(":","-")+".csv","w",newline="") as file:
         writer = csv.writer(file)
         for item in mlkfs:
             writer.writerow([item])
     
-excel.save("./data/Loudness_Report_"+startDate+".xlsx")
-#os.remove(concatenated_wav)
+excel.save("/mnt/raid/data/Loudness_Report_"+startDate+".xlsx")
+os.remove(concatenated_wav)
