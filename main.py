@@ -33,14 +33,14 @@ nextDate=videoToWav.convert_date_format(nextDate)
 ##해당날짜, 다음날짜 파일들 합치기
 video_files = videoToWav.find_ts_files('/mnt/raid/video/'+startDate+'/SBS-HD-NAMSAN/')
 #video_files += videoToWav.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
-concatenated_wav = './data/tmp' + startDate + '.wav'
+concatenated_wav = '/home/logger/Documents/LoudnessLogging/data/tmp' + startDate + '.wav'
 videoToWav.concatenate_videos(video_files, concatenated_wav)
 
 # 시작시간 구하기
 sHours, sMinutes, sSeconds = map(int, EventList[0][2].text[:-3].split(":"))
 ss=timedelta(hours=sHours-4,minutes=sMinutes,seconds=sSeconds).total_seconds() + 1
-if not os.path.exists("./data/"+startDate):
-    os.makedirs("./data/"+startDate)
+if not os.path.exists('/mnt/raid/data/'+startDate):
+    os.makedirs('/mnt/raid/data/'+startDate)
 
 # 편성정보 프로그램별로 계산 및 엑셀에 기록
 for EventInfo in EventList:
