@@ -21,7 +21,7 @@ EventListSize = len(EventList)
 # Excel Report File
 excel = openpyxl.Workbook()
 sheet = excel.active
-columns = ["Start Time","End Time","Duration","ILKFS","Title","ID","DescriptiveLUFS"]
+columns = ["Start Time","End Time","Duration","ILKFS","Title","ID"]
 sheet.append(columns)
 
 # 날짜와 다음날짜 구하기
@@ -32,7 +32,7 @@ nextDate=videoToWav.convert_date_format(nextDate)
 
 ##해당날짜, 다음날짜 파일들 합치기
 video_files = videoToWav.find_ts_files('/mnt/raid/video/'+startDate+'/SBS-HD-NAMSAN/')
-#video_files += videoToWav.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
+video_files += videoToWav.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
 concatenated_wav = '/home/logger/Documents/LoudnessLogging/data/tmp' + startDate + '.wav'
 videoToWav.concatenate_videos(video_files, concatenated_wav)
 
