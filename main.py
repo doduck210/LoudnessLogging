@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import getLoudness
 import videoToWav
 import openpyxl
@@ -32,7 +32,7 @@ nextDate=videoToWav.convert_date_format(nextDate)
 
 ##해당날짜, 다음날짜 파일들 합치기
 video_files = videoToWav.find_ts_files('/mnt/raid/video/'+startDate+'/SBS-HD-NAMSAN/')
-video_files += videoToWav.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
+#video_files += videoToWav.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
 concatenated_wav = '/home/logger/Documents/LoudnessLogging/data/tmp' + startDate + '.wav'
 videoToWav.concatenate_videos(video_files, concatenated_wav)
 
@@ -60,16 +60,22 @@ for EventInfo in EventList:
     EndTime = StartTime+Duration
     EndTimeStr = EndTime.strftime("%H:%M:%S")
 
+    # <4시, 익일 7시< 인 시간대는 제외
+    date_obj = datetime.strptime(OnAirDate, "%d/%m/%Y")
+    time_obj = datetime.strptime(StartTimeStr, "%H:%M:%S")
+    datetime_obj = datetime.combine(date_obj, time_obj.time())
+    morning4 = datetime.combine(yesterday, time(4, 0, 0))
+    if datetime_obj<morning4:
+        continue
+    morning7 = datetime.combine(today, time(7, 0, 0))
+    if EndTime>morning7:
+        continue
+
     # get Loudness
     dd=Duration.total_seconds()
     lufs , mlkfs= getLoudness.splitAndLoud(concatenated_wav,ss,dd)
     print(EventIndex, ' / ', EventListSize, ' : ' ,lufs)
     ss+=dd
-    #dlufs=""
-    #if descriptive == "True":
-    #    filepath="/mnt/raid/audio/"+startDate+"/secondary/secondary_"+StartTimeStr.replace(":","-")+".wav"
-    #    dlufs, dmlkfs = getLoudness.getLoudness(filepath)
-    #    print("descriptive : ",dlufs)
 
     # writing to excel
     row=[StartTimeStr,EndTimeStr,DurationStr,lufs,EventTitle,PGMID]
