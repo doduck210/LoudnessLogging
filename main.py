@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, time
 import getLoudness
 import videoToWav
+import spaceClearing
 import openpyxl
 import csv
 import os
@@ -88,3 +89,5 @@ for EventInfo in EventList:
     
 excel.save("/mnt/raid/data/Loudness_Report_"+startDate+".xlsx")
 os.remove(concatenated_wav)
+spaceClearing.videoClearing()
+spaceClearing.logClearing()
