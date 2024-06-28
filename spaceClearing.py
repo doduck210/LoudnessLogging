@@ -17,7 +17,7 @@ def videoClearing():
             print(f"Deleted Folder : {folder}")
 
 def logClearing():
-    logDir="./data"
+    logDir="/home/logger/Documents/LoudnessLogging/data"
     
     logOldStandard = datetime.date.today() - datetime.timedelta(days=180)
 
