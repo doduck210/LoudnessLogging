@@ -5,10 +5,19 @@ import videoToWav
 import spaceClearing
 import openpyxl
 import csv
-import os
+import sys, os
 
 #날짜 구하기
 today=datetime.now()
+before=0
+try:
+    before=int(sys.argv[1])
+    if before>=50 or before<0:
+        print("Audio are archived only for 50 days")
+        os._exit(0)
+    today=today-timedelta(days=before)
+except:
+    print("No input detected. Default is yesterday")
 yesterday=today-timedelta(days=1)
 todayStr=today.strftime('%Y%m%d')
 yesterdayStr=yesterday.strftime('%Y%m%d')
@@ -34,8 +43,9 @@ nextDate=videoToWav.convert_date_format(nextDate)
 ##해당날짜, 다음날짜 파일들 합치기
 video_files = videoToWav.find_ts_files('/mnt/raid/video/'+startDate+'/SBS-HD-NAMSAN/')
 #video_files += videoToWav.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
-concatenated_wav = '/home/logger/Documents/LoudnessLogging/data/tmp' + startDate + '.wav'
-videoToWav.concatenate_videos(video_files, concatenated_wav)
+concatenated_wav = '/mnt/raid/audio/' + startDate + '.wav'
+if not os.path.exists(concatenated_wav):
+    videoToWav.concatenate_videos(video_files, concatenated_wav)
 
 # 시작시간 구하기
 sHours, sMinutes, sSeconds = map(int, EventList[0][2].text[:-3].split(":"))
@@ -88,6 +98,5 @@ for EventInfo in EventList:
             writer.writerow([item])
     
 excel.save("/mnt/raid/data/Loudness_Report_"+startDate+".xlsx")
-os.remove(concatenated_wav)
 spaceClearing.videoClearing()
 spaceClearing.logClearing()

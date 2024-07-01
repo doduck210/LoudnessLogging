@@ -16,6 +16,19 @@ def videoClearing():
             shutil.rmtree(folderPath)
             print(f"Deleted Folder : {folder}")
 
+def audioClearing():
+    audioDir = '/mnt/raid/audio'
+
+    audioOldStandard = datetime.date.today() - datetime.timedelta(days=50)
+
+    for files in os.listdir(audioDir):
+        fileDateStr = files[:-4].split('-')
+        fileDate = datetime.date( int(fileDateStr[0]), int(fileDateStr[1]), int(fileDateStr[2]))
+        if fileDate < audioOldStandard :
+            folderPath = os.path.join(audioDir,files)
+            shutil.rmtree(folderPath)
+            print(f"Deleted File : {files}")
+
 def logClearing():
     logDir="/home/logger/Documents/LoudnessLogging/data"
     

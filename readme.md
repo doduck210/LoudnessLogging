@@ -2,7 +2,15 @@
 Loudness Logging for SBS   
 
 Used and Edited LKFS calc algorithm from [pyloudnrom](https://github.com/csteinmetz1/pyloudnorm)   
-    
+
+## Usage
+``` shell
+python main.py [option]
+```
+Option : 0\<Integer\<50 (며철 전 데이터 작업을 원하는지)    
+default = 0 는 하루전  
+
+
 ## 개요
 Input :
 * 작일 편성표 : .xml (SBS 편성표 형식 그대로)
