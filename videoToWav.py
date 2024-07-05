@@ -1,6 +1,9 @@
 import subprocess
 import os
 from datetime import datetime, timedelta
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # 폴더 내의 모든 mp4 파일을 찾아서 리스트로 반환
 def find_ts_files(directory):
@@ -58,3 +61,27 @@ def split_wav_and_save(input_wav, start_time, duration, output_folder):
     subprocess.run(command, check=True)
     
     print(f'Split audio saved to: {output_wav}')
+
+def sendEmail():
+    sender_email="duck@yonsei.ac.kr"
+    receiver_email="duck@sbs.co.kr"
+    app_password="bcuk dcen rdnw bjhi"
+
+    subject="Loudness Logger 에러 알림"
+    text="Loudness Logger가 정상적으로 실행되지 못했습니다. 류덕형 혹은 정비실에 연락 부탁드립니다."
+    html=f"<html><body><p>{text}</p></body></html>"
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = subject
+    message["From"] = sender_email
+    message["To"] = receiver_email
+
+    part1 = MIMEText(text, "plain")
+    part2 = MIMEText(html, "html")
+
+    message.attach(part1)
+    message.attach(part2)
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(sender_email, app_password)
+        server.sendmail(sender_email, receiver_email, message.as_string())
