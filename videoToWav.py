@@ -65,7 +65,9 @@ def split_wav_and_save(input_wav, start_time, duration, output_folder):
 def sendEmail():
     sender_email="duck@yonsei.ac.kr"
     receiver_email="duck@sbs.co.kr"
-    app_password="bcuk dcen rdnw bjhi"
+    f=open("/home/loger/Documents/LoudnessLogging/password","r")
+    app_password=f.read()
+    f.close()
 
     subject="Loudness Logger 에러 알림"
     text="Loudness Logger가 정상적으로 실행되지 못했습니다. 류덕형 혹은 정비실에 연락 부탁드립니다."
