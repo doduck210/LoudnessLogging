@@ -65,7 +65,7 @@ def split_wav_and_save(input_wav, start_time, duration, output_folder):
 def sendEmail():
     sender_email="duck@yonsei.ac.kr"
     receiver_email="duck@sbs.co.kr"
-    f=open("/home/loger/Documents/LoudnessLogging/password","r")
+    f=open("/home/logger/Documents/LoudnessLogging/password","r")
     app_password=f.read()
     f.close()
 

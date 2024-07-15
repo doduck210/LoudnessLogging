@@ -77,10 +77,13 @@ try:
         time_obj = datetime.strptime(StartTimeStr, "%H:%M:%S")
         datetime_obj = datetime.combine(date_obj, time_obj.time())
         morning4 = datetime.combine(yesterday, time(4, 0, 0))
+        dd=Duration.total_seconds()
         if datetime_obj<morning4:
+            ss+=dd
             continue
         morning7 = datetime.combine(today, time(7, 0, 0))
         if EndTime>morning7:
+            ss+=dd
             continue
 
         # get Loudness
