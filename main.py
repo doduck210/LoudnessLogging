@@ -7,7 +7,7 @@ import openpyxl
 import csv
 import sys, os
 
-try:
+def main(input_dir):
     #날짜 구하기
     today=datetime.now()
     before=0
@@ -22,6 +22,7 @@ try:
     yesterday=today-timedelta(days=1)
     todayStr=today.strftime('%Y%m%d')
     yesterdayStr=yesterday.strftime('%Y%m%d')
+    print('ILKFS calculating for ', input_dir , ' channel has been started')
 
     # xml (편성표) 파일 열기
     parser=ET.XMLParser(encoding="utf-8")
@@ -42,9 +43,9 @@ try:
     nextDate=videoToWav.convert_date_format(nextDate)
 
     ##해당날짜, 다음날짜 파일들 합치기
-    video_files = videoToWav.find_ts_files('/mnt/raid/video/'+startDate+'/SBS-HD-NAMSAN/')
+    video_files = videoToWav.find_ts_files('/mnt/raid/video/'+startDate+'/'+input_dir)
     #video_files += videoToWav.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
-    concatenated_wav = '/mnt/raid/audio/' + startDate + '.wav'
+    concatenated_wav = '/mnt/raid/audio/' + startDate + input_dir + '.wav'
     if not os.path.exists(concatenated_wav):
         videoToWav.concatenate_videos(video_files, concatenated_wav)
 
@@ -96,13 +97,18 @@ try:
         row=[StartTimeStr,EndTimeStr,DurationStr,lufs,EventTitle,PGMID]
         sheet.append(row)
         # momentary lkfs saving
-        with open('/mnt/raid/data/'+startDate+"/mlkfs"+StartTimeStr.replace(":","-")+".csv","w",newline="") as file:
+        with open('/mnt/raid/data/'+startDate+"/mlkfs"+StartTimeStr.replace(":","-")+input_dir+".csv","w",newline="") as file:
             writer = csv.writer(file)
             for item in mlkfs:
                 writer.writerow([item])
         
-    excel.save("/mnt/raid/data/Loudness_Report_"+startDate+".xlsx")
-    spaceClearing.videoClearing()
-    spaceClearing.logClearing()
-except:
-    videoToWav.sendEmail()
+    excel.save("/mnt/raid/data/Loudness_Report_"+startDate+input_dir+".xlsx")
+
+if __name__=="__main__":
+    try:
+        main('SBS-HD-NAMSAN')
+        main('SBS-UHD')
+        spaceClearing.videoClearing()
+        spaceClearing.logClearing()
+    except:
+        videoToWav.sendEmail()

@@ -6,7 +6,7 @@ def videoClearing():
     videoDir = '/mnt/raid/video'
 
     # old standard is set as 3 days
-    videoOldStandard = datetime.date.today() - datetime.timedelta(days=3)
+    videoOldStandard = datetime.date.today() - datetime.timedelta(days=2)
 
     for folder in os.listdir(videoDir):
         folderDateStr = folder.split('-')
@@ -22,7 +22,7 @@ def audioClearing():
     audioOldStandard = datetime.date.today() - datetime.timedelta(days=50)
 
     for files in os.listdir(audioDir):
-        fileDateStr = files[:-4].split('-')
+        fileDateStr = files[:10].split('-')
         fileDate = datetime.date( int(fileDateStr[0]), int(fileDateStr[1]), int(fileDateStr[2]))
         if fileDate < audioOldStandard :
             folderPath = os.path.join(audioDir,files)
@@ -42,3 +42,5 @@ def logClearing():
             os.remove(filePath)
             print(f"Deleted File : {files}")
         
+if __name__ == '__main__':
+    print('N/A')
