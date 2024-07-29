@@ -51,7 +51,12 @@ def main(input_dir):
 
     # 시작시간 구하기
     sHours, sMinutes, sSeconds = map(int, EventList[0][2].text[:-3].split(":"))
-    ss=timedelta(hours=sHours-4,minutes=sMinutes,seconds=sSeconds).total_seconds() + 1
+    ss=timedelta(hours=sHours-4,minutes=sMinutes,seconds=sSeconds).total_seconds()
+    # RF 보정값
+    if input_dir=='SBS-HD-NAMSAN':
+        ss+=0.5
+    elif input_dir == 'SBS-UHD':
+        ss-=2
     if not os.path.exists('/mnt/raid/data/'+startDate):
         os.makedirs('/mnt/raid/data/'+startDate)
 
@@ -110,5 +115,7 @@ if __name__=="__main__":
         main('SBS-UHD')
         spaceClearing.videoClearing()
         spaceClearing.logClearing()
-    except:
-        videoToWav.sendEmail()
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        videoToWav.sendEmail(e)
