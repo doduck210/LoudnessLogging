@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, time
 import getLoudness
-import videoToWav
+import utils
 import spaceClearing
 import openpyxl
 import csv
@@ -38,16 +38,16 @@ def main(input_dir):
 
     # 날짜와 다음날짜 구하기
     startDate = EventList[0][1].text
-    nextDate = videoToWav.get_next_day(startDate)
-    startDate=videoToWav.convert_date_format(startDate)
-    nextDate=videoToWav.convert_date_format(nextDate)
+    nextDate = utils.get_next_day(startDate)
+    startDate=utils.convert_date_format(startDate)
+    nextDate=utils.convert_date_format(nextDate)
 
     ##해당날짜, 다음날짜 파일들 합치기
-    video_files = videoToWav.find_ts_files('/mnt/raid/video/'+startDate+'/'+input_dir)
-    #video_files += videoToWav.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
+    video_files = utils.find_ts_files('/mnt/raid/video/'+startDate+'/'+input_dir)
+    #video_files += utils.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
     concatenated_wav = '/mnt/raid/audio/' + startDate + input_dir + '.wav'
     if not os.path.exists(concatenated_wav):
-        videoToWav.concatenate_videos(video_files, concatenated_wav)
+        utils.concatenate_videos(video_files, concatenated_wav)
 
     # 시작시간 구하기
     sHours, sMinutes, sSeconds = map(int, EventList[0][2].text[:-3].split(":"))
@@ -141,16 +141,15 @@ def sdiMain():
 
     # 날짜와 다음날짜 구하기
     startDate = EventList[0][1].text
-    nextDate = videoToWav.get_next_day(startDate)
-    startDate=videoToWav.convert_date_format(startDate)
-    nextDate=videoToWav.convert_date_format(nextDate)
+    nextDate = utils.get_next_day(startDate)
+    startDate=utils.convert_date_format(startDate)
+    nextDate=utils.convert_date_format(nextDate)
 
     ##해당날짜, 다음날짜 파일들 합치기
-    video_files = videoToWav.find_ts_files('/mnt/raid/video/'+startDate+'/'+input_dir)
-    #video_files += videoToWav.find_ts_files('/mnt/raid/video/'+nextDate+'/SBS-HD-NAMSAN/')
-    concatenated_wav = '/mnt/raid/audio/' + startDate + input_dir + '.wav'
+    video_files = utils.listupWavFiles("/mnt/jungbi",startDate,nextDate)
+    concatenated_wav = '/mnt/raid/audio/' + startDate + 'sdi.wav'
     if not os.path.exists(concatenated_wav):
-        videoToWav.concatenate_videos(video_files, concatenated_wav)
+        utils.concatenate_videos(video_files, concatenated_wav)
 
     # 시작시간 구하기
     sHours, sMinutes, sSeconds = map(int, EventList[0][2].text[:-3].split(":"))
@@ -201,20 +200,22 @@ def sdiMain():
         row=[StartTimeStr,EndTimeStr,DurationStr,lufs,EventTitle,PGMID]
         sheet.append(row)
         # momentary lkfs saving
-        with open('/mnt/raid/data/'+startDate+"/mlkfs"+StartTimeStr.replace(":","-")+input_dir+".csv","w",newline="") as file:
+        with open('/mnt/raid/data/'+startDate+"/mlkfs"+StartTimeStr.replace(":","-")+"sdi.csv","w",newline="") as file:
             writer = csv.writer(file)
             for item in mlkfs:
                 writer.writerow([item])
         
-    excel.save("/mnt/raid/data/Loudness_Report_"+startDate+input_dir+".xlsx")
+    excel.save("/mnt/raid/data/Loudness_Report_"+startDate+"sdi.xlsx")
 
 if __name__=="__main__":
     try:
         main('SBS-HD-NAMSAN')
         main('SBS-UHD')
+        sdiMain()
         spaceClearing.videoClearing()
         spaceClearing.logClearing()
     except KeyboardInterrupt:
         pass
-    except Exception as e:
-        videoToWav.sendEmail(e)
+    #except Exception as e:
+        #print(e)
+        #utils.sendEmail(str(e))

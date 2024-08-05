@@ -9,6 +9,9 @@ from email.mime.multipart import MIMEMultipart
 def find_ts_files(directory):
     return [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith('.ts')]
 
+def listupWavFiles(dir,startdate,nextdate):
+    return [os.path.join(dir, file) for file in os.listdir(dir) if file >= (startdate+"_04.00.00.wav") and file <= (nextdate+"_06.00.00.wav")]
+
 def get_next_day(date_text):
     # 'dd/mm/yyyy' 형식의 날짜를 datetime 객체로 변환
     date_format = "%d/%m/%Y"
@@ -40,7 +43,7 @@ def concatenate_videos(video_files, output_file):
         for file in video_files:
             f.write(f"file '{file}'\n")
     
-    subprocess.run(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', tmp_file, '-vn','-c:a', 'pcm_s16le', output_file], check=True)
+    subprocess.run(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', tmp_file, '-vn', '-ac', '2', '-c:a', 'pcm_s16le', output_file], check=True)
     os.remove(tmp_file)
 
 def split_wav_and_save(input_wav, start_time, duration, output_folder):
@@ -89,3 +92,6 @@ def sendEmail(error_message):
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(sender_email, app_password)
         server.sendmail(sender_email, receiver_email, message.as_string())
+
+if __name__=="__main__":
+    print(listupWavFiles("/mnt/jungbi","2024-08-04","2024-08-05"))
