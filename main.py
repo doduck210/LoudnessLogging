@@ -5,7 +5,7 @@ import utils
 import spaceClearing
 import openpyxl
 import csv
-import sys, os
+import sys, os, traceback
 
 def main(input_dir):
     #날짜 구하기
@@ -210,12 +210,12 @@ def sdiMain():
 if __name__=="__main__":
     try:
         main('SBS-HD-NAMSAN')
-        main('SBS-UHD')
+        #main('SBS-UHD')
         sdiMain()
         spaceClearing.videoClearing()
         spaceClearing.logClearing()
     except KeyboardInterrupt:
         pass
-    #except Exception as e:
-        #print(e)
-        #utils.sendEmail(str(e))
+    except Exception:
+        print(traceback.format_exc())
+        utils.sendEmail(traceback.format_exc())
