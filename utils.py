@@ -43,7 +43,7 @@ def concatenate_videos(video_files, output_file):
         for file in video_files:
             f.write(f"file '{file}'\n")
     
-    subprocess.run(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', tmp_file, '-vn', '-ac', '2', '-c:a', 'pcm_s16le', output_file], check=True)
+    subprocess.run(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', tmp_file, '-vn', '-af', 'pan=2c|c0=c0|c1=c1', '-c:a', 'pcm_s16le', output_file], check=True)
     os.remove(tmp_file)
 
 def split_wav_and_save(input_wav, start_time, duration, output_folder):

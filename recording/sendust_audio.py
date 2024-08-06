@@ -83,7 +83,7 @@ for each in range(probe.get_device_count()):
 device_index = int(input("Select audio device number   "))
 
 format = probe.get_format_from_width(2, False)  # 2 byte, unsigned = True
-stream = probe.open(rate=FRAMES_PER_SECOND, channels=2,  format=format, input=True, output=False, input_device_index=device_index, stream_callback =cb_audio)
+stream = probe.open(rate=FRAMES_PER_SECOND, channels=2,  format=format, input=True, output=False, input_device_index=device_index, stream_callback=cb_audio)
 
 
 
