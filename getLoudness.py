@@ -19,18 +19,25 @@ def splitAndLoud(file_path,start_time,duration):
 
 
 def programLoudness(inputDir, startTime, endTime, correctionTime=0, save=True, outputDir="", fileName="program"):
-    """ 편성에 따른 Loudness값 return
+    """ 프로그램 시간 따른 Loudness값 return
     
     Parameters
     ----------
-    inputDir : location of wav files
-    startTime : schedule start time
-    endTime : schedule end time
-    correctionTime : correction seconds. 보정값(초)
+    inputDir :
+        location of wav files
+    startTime : datetime 
+        schedule start time
+    endTime : datetime
+        schedule end time
+    correctionTime : float
+        correction seconds. 보정값(초)
 
-    save : weather to save program(cutted) wav file
-    outputDir : location to save program(cutted) wav file
-    fileName : fileName of program(cutted) wav file
+    save : bool
+        weather to save program(cutted) wav file
+    outputDir : 
+        location to save program(cutted) wav file
+    fileName : 
+        fileName of program(cutted) wav file
     """
     # 보정값 처리
     startTime+=timedelta(seconds=correctionTime)
@@ -60,14 +67,12 @@ def programLoudness(inputDir, startTime, endTime, correctionTime=0, save=True, o
         else : # 파일 여러개면 처음과 끝파일을 임시로 만들고 tmplist임시로 만들어서 처리
             # 첫파일
             subprocess.run(
-                ['ffmpeg','-i',fileList[0],'-ss',str(ss)
-                ,'-vn', '-af', 'pan=2c|c0=c0|c1=c1', '-c:a', 'pcm_s24le',"tmpStart.wav"]
+                ['ffmpeg','-i',fileList[0],'-ss',str(ss),"tmpStart.wav"]
                 ,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
                 ,check=True)
             # 끝파일
             subprocess.run(
-                ['ffmpeg','-i',fileList[-1],'-to',str(to)
-                ,'-vn', '-af', 'pan=2c|c0=c0|c1=c1', '-c:a', 'pcm_s24le',"tmpEnd.wav"]
+                ['ffmpeg','-i',fileList[-1],'-to',str(to),"tmpEnd.wav"]
                 ,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
                 ,check=True)
             #파일 리스트 임시생성
@@ -80,14 +85,15 @@ def programLoudness(inputDir, startTime, endTime, correctionTime=0, save=True, o
             # 최종 파일 생성
             subprocess.run(
                 ['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', tmpFileListTxt
-                ,'-vn', '-af', 'pan=2c|c0=c0|c1=c1', '-c:a', 'pcm_s24le', cutWav]
+                  ,'-af', 'pan=2c|c0=c0|c1=c1', cutWav]
+                #,'-vn', '-af', 'pan=2c|c0=c0|c1=c1', '-c:a', 'pcm_s16le', cutWav]
                 ,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
                 , check=True)
                 
             # 임시파일들 삭제
             os.remove("tmpStart.wav")
             os.remove("tmpEnd.wav")
-            os.remove(tmpFileListTxt)
+            #os.remove(tmpFileListTxt)
 
         ilkfs,mlkfs = getLoudness(cutWav)
     

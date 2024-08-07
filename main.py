@@ -110,7 +110,23 @@ def main(input_dir):
     excel.save("/mnt/raid/data/Loudness_Report_"+startDate+input_dir+".xlsx")
 
 
-def sdiMain():
+def sdiMain(scheduleDir,audioDir,outputDir,chnlName, outputAudioDir=""):
+    ''' 편성파일과 오디오파일로 Loudness Report 생성
+    
+    Parameters
+    ----------
+    scheduleDir : 
+        편성파일위치
+    audioDir :
+         wav파일들 위치
+    outputDir : 
+        report생성할 위치
+    chnlName : 
+        채널명. 채널명으로 리포트 생성
+    outputAudioDir :
+        프로그램별로 잘린 오디오 저장할 위치. 
+        해당 위치에 날짜폴더 생기고 "[PGM IDX]_[편성시작시간].wav" 파일 생성
+    '''
     #날짜 구하기
     today=datetime.now()
     before=0
@@ -129,7 +145,7 @@ def sdiMain():
 
     # xml (편성표) 파일 열기
     parser=ET.XMLParser(encoding="utf-8")
-    file = ET.parse('/mnt/raid/schedule/'+yesterdayStr+'.xml',parser=parser)
+    file = ET.parse(os.path.join(scheduleDir,yesterdayStr+'.xml'),parser=parser)
     EventList = file.getroot()
     EventListSize = len(EventList)
 
@@ -144,19 +160,20 @@ def sdiMain():
     nextDate = utils.get_next_day(startDate)
     startDate=utils.convert_date_format(startDate)
     nextDate=utils.convert_date_format(nextDate)
-
-    ##해당날짜, 다음날짜 파일들 합치기
-    video_files = utils.listupWavFiles("/mnt/jungbi",startDate,nextDate)
-    concatenated_wav = '/mnt/raid/audio/' + startDate + 'sdi.wav'
-    if not os.path.exists(concatenated_wav):
-        utils.concatenate_videos(video_files, concatenated_wav)
-
-    # 시작시간 구하기
-    sHours, sMinutes, sSeconds = map(int, EventList[0][2].text[:-3].split(":"))
-    ss=timedelta(hours=sHours-4,minutes=sMinutes,seconds=sSeconds).total_seconds()
     
-    if not os.path.exists('/mnt/raid/data/'+startDate):
-        os.makedirs('/mnt/raid/data/'+startDate)
+    # output 폴더 및 파일명 설정
+    if not os.path.exists(outputDir):
+        os.makedirs(outputDir)
+    outputFile=os.path.join(outputDir,chnlName+"_Loudness_Report_"+startDate+".xlsx")
+    outputMlkfsDir=os.path.join(outputDir,"mlkfs")
+    if not os.path.exists(outputMlkfsDir):
+        os.makedirs(outputMlkfsDir)
+    outputMlkfsDir=os.path.join(outputMlkfsDir,startDate)
+    if not os.path.exists(outputMlkfsDir):
+        os.makedirs(outputMlkfsDir)
+    outputAudioDir=os.path.join(outputAudioDir,startDate)
+    if not os.path.exists(outputAudioDir):
+        os.makedirs(outputAudioDir)
 
     # 편성정보 프로그램별로 계산 및 엑셀에 기록
     for EventInfo in EventList:
@@ -175,43 +192,36 @@ def sdiMain():
         Duration = timedelta(hours=dHours,minutes=dMinutes,seconds=dSeconds)
         EndTime = StartTime+Duration
         EndTimeStr = EndTime.strftime("%H:%M:%S")
-
-        # <4시, 익일 7시< 인 시간대는 제외
-        date_obj = datetime.strptime(OnAirDate, "%d/%m/%Y")
-        time_obj = datetime.strptime(StartTimeStr, "%H:%M:%S")
-        datetime_obj = datetime.combine(date_obj, time_obj.time())
-        morning4 = datetime.combine(yesterday, time(4, 0, 0))
-        dd=Duration.total_seconds()
-        if datetime_obj<morning4:
-            ss+=dd
-            continue
-        morning7 = datetime.combine(today, time(7, 0, 0))
-        if EndTime>morning7:
-            ss+=dd
-            continue
-
-        # get Loudness
-        dd=Duration.total_seconds()
-        lufs , mlkfs= getLoudness.splitAndLoud(concatenated_wav,ss,dd)
+        
+        # calc loudness
+        lufs , mlkfs = getLoudness.programLoudness(
+            inputDir=audioDir,
+            startTime=StartTime,
+            endTime=EndTime,
+            correctionTime=1.8,
+            save=True,
+            outputDir=outputAudioDir,
+            fileName=EventIndex+"_"+StartTimeStr.replace(":","-"))
+    
         print(EventIndex, ' / ', EventListSize, ' : ' ,lufs)
-        ss+=dd
-
+    
         # writing to excel
         row=[StartTimeStr,EndTimeStr,DurationStr,lufs,EventTitle,PGMID]
         sheet.append(row)
         # momentary lkfs saving
-        with open('/mnt/raid/data/'+startDate+"/mlkfs"+StartTimeStr.replace(":","-")+"sdi.csv","w",newline="") as file:
+        mlkfsPath=os.path.join(outputMlkfsDir,chnlName+EventIndex+"_"+StartTimeStr.replace(":","-")+"csv")
+        with open(mlkfsPath,"w",newline="") as file:
             writer = csv.writer(file)
             for item in mlkfs:
                 writer.writerow([item])
         
-    excel.save("/mnt/raid/data/Loudness_Report_"+startDate+"sdi.xlsx")
+    excel.save(outputFile)
 
 if __name__=="__main__":
     try:
         main('SBS-HD-NAMSAN')
         #main('SBS-UHD')
-        #sdiMain()
+        sdiMain('/mnt/raid/schedule/','/mnt/jungbi','/mnt/raid/data','CleanPGM','/mnt/raid/audio')
         spaceClearing.videoClearing()
         spaceClearing.logClearing()
     except KeyboardInterrupt:

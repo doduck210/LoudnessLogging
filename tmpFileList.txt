@@ -1,0 +1,6 @@
+file tmpStart.wav
+file '/mnt/jungbi/2024-08-06_01.00.00.wav'
+file '/mnt/jungbi/2024-08-06_02.00.00.wav'
+file '/mnt/jungbi/2024-08-06_03.00.00.wav'
+file '/mnt/jungbi/2024-08-06_04.00.00.wav'
+file tmpEnd.wav
