@@ -211,7 +211,7 @@ if __name__=="__main__":
     try:
         main('SBS-HD-NAMSAN')
         #main('SBS-UHD')
-        sdiMain()
+        #sdiMain()
         spaceClearing.videoClearing()
         spaceClearing.logClearing()
     except KeyboardInterrupt:
