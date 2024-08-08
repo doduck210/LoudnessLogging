@@ -41,7 +41,7 @@ def concatenate_videos(video_files, output_file):
     
     with open(tmp_file, 'w') as f: # 파일 리스트 작성
         for file in video_files:
-            f.write(f"file '{file}'\n")
+            f.write(f"file  '{file}'\n")
     
     subprocess.run(['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', tmp_file, '-vn', '-af', 'pan=2c|c0=c0|c1=c1', '-c:a', 'pcm_s16le', output_file], check=True)
     os.remove(tmp_file)
@@ -64,6 +64,19 @@ def split_wav_and_save(input_wav, start_time, duration, output_folder):
     subprocess.run(command, check=True)
     
     print(f'Split audio saved to: {output_wav}')
+
+def audioExistCheck(audioDir,scheduleStart:datetime,scheduleEnd:datetime):
+    '''
+    scheduleStart : datetime  
+    scheduleEnd : datetime
+    '''
+    startFile=os.path.join(audioDir,scheduleStart.strftime("%Y-%m-%d_%H.00.00")+".wav")
+    endFile=os.path.join(audioDir,scheduleEnd.strftime("%Y-%m-%d_%H.00.00")+".wav")
+    if not os.path.exists(startFile):
+        return False
+    if not os.path.exists(endFile):
+        return False
+    return True
 
 def sendEmail(error_message):
     sender_email="duck@yonsei.ac.kr"

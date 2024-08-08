@@ -2,18 +2,20 @@ import requests
 from datetime import datetime, timedelta
 from pprint import pprint
 from xml.etree.ElementTree import Element, SubElement, ElementTree
-import math
+import math, os
 
-def scheduleRequest(savingPath):
-    today = datetime.now()
-    yesterday = today - timedelta(days=1)
-    yesterday = yesterday.strftime("%Y-%m-%d")
-    target = f"http://10.110.21.31/cms/api/frmtn/dailyInfo.json?date={yesterday}&UHDSchedule=False"
+def scheduleRequest(savingPath,date="YYYY-MM-DD"):
+    #date 입력값이 없으면 하루 전 편성 요청이 default
+    if date=="YYYY-MM-DD":
+        today = datetime.now()
+        date = today - timedelta(days=1)
+        date = date.strftime("%Y-%m-%d")
+    target = f"http://10.110.21.31/cms/api/frmtn/dailyInfo.json?date={date}&UHDSchedule=False"
 
     response = requests.get(target)
     response_json = response.json()
     items = response_json["items"]
-    filename = yesterday.replace("-", "") + ".xml"
+    filename = date.replace("-", "") + ".xml"
 
     root = Element("EventList")
     for index, item in enumerate(items):
@@ -33,6 +35,8 @@ def scheduleRequest(savingPath):
         SubElement(EventInfo, "EventTitle").text = item["ProgramItemName"]
         SubElement(EventInfo,"DescriptiveVideoService").text=item["DescriptiveVideoService"]
 
-
     tree = ElementTree(root)
-    tree.write(savingPath + '/' + filename, encoding="utf8")
+    tree.write(os.path.join(savingPath, filename), encoding="utf8")
+
+if __name__ == "__main__" : 
+    scheduleRequest("/mnt/raid","2013-07-01")

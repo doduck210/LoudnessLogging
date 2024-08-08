@@ -18,7 +18,7 @@ def splitAndLoud(file_path,start_time,duration):
     return lufs, mlkfs
 
 
-def programLoudness(inputDir, startTime, endTime, correctionTime=0, save=True, outputDir="", fileName="program"):
+def programLoudness(inputDir, startTime, endTime, correctionTime=0, save=True, outputDir="", fileName="tmpProgram"):
     """ 프로그램 시간 따른 Loudness값 return
     
     Parameters
@@ -44,6 +44,9 @@ def programLoudness(inputDir, startTime, endTime, correctionTime=0, save=True, o
     endTime+=timedelta(seconds=correctionTime)
     # 프로그램 wav파일 이름
     cutWav = os.path.join(outputDir,fileName+".wav")
+    if os.path.exists(cutWav):
+        ilkfs,mlkfs = getLoudness(cutWav)
+        return ilkfs, mlkfs
     # 파일리스트 찾기 위한 첫파일, 끝파일
     startHourStr=startTime.strftime("%Y-%m-%d_%H.00.00")
     endHourStr=endTime.strftime("%Y-%m-%d_%H.00.00")
@@ -86,14 +89,13 @@ def programLoudness(inputDir, startTime, endTime, correctionTime=0, save=True, o
             subprocess.run(
                 ['ffmpeg', '-y', '-f', 'concat', '-safe', '0', '-i', tmpFileListTxt
                   ,'-af', 'pan=2c|c0=c0|c1=c1', cutWav]
-                #,'-vn', '-af', 'pan=2c|c0=c0|c1=c1', '-c:a', 'pcm_s16le', cutWav]
                 ,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
                 , check=True)
                 
             # 임시파일들 삭제
             os.remove("tmpStart.wav")
             os.remove("tmpEnd.wav")
-            #os.remove(tmpFileListTxt)
+            os.remove(tmpFileListTxt)
 
         ilkfs,mlkfs = getLoudness(cutWav)
     

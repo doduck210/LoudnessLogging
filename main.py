@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, time
-import getLoudness
-import utils
+import getLoudness, scheduleRequest, utils
 import spaceClearing
 import openpyxl
 import csv
@@ -110,9 +109,17 @@ def main(input_dir):
     excel.save("/mnt/raid/data/Loudness_Report_"+startDate+input_dir+".xlsx")
 
 
-def sdiMain(scheduleDir,audioDir,outputDir,chnlName, outputAudioDir=""):
+def sdiMain(scheduleDir,audioDir,outputDir,chnlName, date="YYYY-MM-DD", outputAudioDir=""):
     ''' 편성파일과 오디오파일로 Loudness Report 생성
     
+    Algorithm implementation under ITU_R BS.1770-3
+
+    Generated Files
+    ----------
+    - [outputDir]/[chnlName]_Loudness_Report_[date].xlsx,   
+    - [outputDir]/mlkfs/[date]/[chnlName]_[PGM IDX}_[PGM Start Time].csv   
+    - (optional) [outputAudioDir]/[chnlName]_[PGM IDX]_[PGM Start Time].wav
+
     Parameters
     ----------
     scheduleDir : 
@@ -121,33 +128,42 @@ def sdiMain(scheduleDir,audioDir,outputDir,chnlName, outputAudioDir=""):
          wav파일들 위치
     outputDir : 
         report생성할 위치
+        해당위치에 "[채널명]_Loudness_Report_[날짜].xlsx"파일 생성
+        I값 계산근거인 MLKFS값은 
+        [해당위치]/mlkfs/[날짜] 폴더에 "[채널명]_[PGM_IDX}_[편성시작시간].csv" 으로생성
     chnlName : 
         채널명. 채널명으로 리포트 생성
+    date : str
+        "YYYY-MM-DD"
     outputAudioDir :
         프로그램별로 잘린 오디오 저장할 위치. 
-        해당 위치에 날짜폴더 생기고 "[PGM IDX]_[편성시작시간].wav" 파일 생성
+        해당 위치에 날짜폴더 생기고 "[채널명]_[PGM IDX]_[편성시작시간].wav" 파일 생성
     '''
     #날짜 구하기
-    today=datetime.now()
-    before=0
-    try:
-        before=int(sys.argv[1])
-        if before>=50 or before<0:
-            print("Audio are archived only for 50 days")
-            os._exit(0)
-        today=today-timedelta(days=before)
-    except:
-        print("No input detected. Default is yesterday")
-    yesterday=today-timedelta(days=1)
-    todayStr=today.strftime('%Y%m%d')
-    yesterdayStr=yesterday.strftime('%Y%m%d')
-    print('ILKFS calculating for SDI channel has been started')
+    if date=="YYYY-MM-DD":
+        date=(datetime.now()-timedelta(days=1)).strftime('%Y-%m-%d')
+        dateStr=(datetime.now()-timedelta(days=1)).strftime('%Y%m%d')
+    else : 
+        dateStr=date.replace("-","")
+    print(date , ' ILKFS calculating for ',chnlName, ' channel has been started')
 
     # xml (편성표) 파일 열기
     parser=ET.XMLParser(encoding="utf-8")
-    file = ET.parse(os.path.join(scheduleDir,yesterdayStr+'.xml'),parser=parser)
-    EventList = file.getroot()
+    if not os.path.exists(os.path.join(scheduleDir,dateStr+'.xml')):
+        scheduleRequest.scheduleRequest(scheduleDir,date)
+    scheduleFile = ET.parse(os.path.join(scheduleDir,dateStr+'.xml'),parser=parser)
+    EventList = scheduleFile.getroot()
     EventListSize = len(EventList)
+    if EventListSize==0 :
+        print("No Schedule for ", date)
+        sys.exit(1)
+
+    # 오디오 파일 있는지 확인
+    scheduleStart = datetime.strptime(f"{EventList[0][1].text} {EventList[0][2].text[:-3]}","%d/%m/%Y %H:%M:%S")
+    scheduleEnd = datetime.strptime(f"{EventList[-1][1].text} {EventList[-1][2].text[:-3]}","%d/%m/%Y %H:%M:%S")
+    if not utils.audioExistCheck(audioDir,scheduleStart,scheduleEnd):
+        print("No recorded audio files maching with schedule")
+        sys.exit(1)
 
     # Excel Report File
     excel = openpyxl.Workbook()
@@ -201,7 +217,7 @@ def sdiMain(scheduleDir,audioDir,outputDir,chnlName, outputAudioDir=""):
             correctionTime=1.8,
             save=True,
             outputDir=outputAudioDir,
-            fileName=EventIndex+"_"+StartTimeStr.replace(":","-"))
+            fileName=chnlName+"_"+EventIndex+"_"+StartTimeStr.replace(":","-"))
     
         print(EventIndex, ' / ', EventListSize, ' : ' ,lufs)
     
@@ -209,7 +225,7 @@ def sdiMain(scheduleDir,audioDir,outputDir,chnlName, outputAudioDir=""):
         row=[StartTimeStr,EndTimeStr,DurationStr,lufs,EventTitle,PGMID]
         sheet.append(row)
         # momentary lkfs saving
-        mlkfsPath=os.path.join(outputMlkfsDir,chnlName+EventIndex+"_"+StartTimeStr.replace(":","-")+"csv")
+        mlkfsPath=os.path.join(outputMlkfsDir,chnlName+"_"+EventIndex+"_"+StartTimeStr.replace(":","-")+".csv")
         with open(mlkfsPath,"w",newline="") as file:
             writer = csv.writer(file)
             for item in mlkfs:
@@ -219,13 +235,30 @@ def sdiMain(scheduleDir,audioDir,outputDir,chnlName, outputAudioDir=""):
 
 if __name__=="__main__":
     try:
-        main('SBS-HD-NAMSAN')
+        #main('SBS-HD-NAMSAN')
         #main('SBS-UHD')
-        sdiMain('/mnt/raid/schedule/','/mnt/jungbi','/mnt/raid/data','CleanPGM','/mnt/raid/audio')
-        spaceClearing.videoClearing()
-        spaceClearing.logClearing()
+        sdiMain(
+            scheduleDir='/mnt/raid/schedule/'
+            ,audioDir='/mnt/jungbi'
+            ,outputDir='/mnt/raid/data'
+            ,chnlName='CleanPGM'
+            ,outputAudioDir='/mnt/raid/audio'
+            )
+        #spaceClearing.videoClearing()
+        #spaceClearing.logClearing()
+        '''
+        try:
+            before=int(sys.argv[1])
+            today=datetime.now()
+            if before>=50 or before<0:
+                print("Audio are archived only for 50 days")
+                os._exit(0)
+            today=today-timedelta(days=before)
+        except:
+            print("No input detected. Default is yesterday")
+        '''
     except KeyboardInterrupt:
         pass
     except Exception:
         print(traceback.format_exc())
-        utils.sendEmail(traceback.format_exc())
+        #utils.sendEmail(traceback.format_exc())
