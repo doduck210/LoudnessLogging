@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loudness Logger</title>
+</head>
+<body>
+    <h1>Loudness Logger</h1>
+    <h2>현재 경로: {{ current_path }}</h2>
+    
+    <h2>디렉토리 목록</h2>
+    <ul>
+        {% for dir in dirs %}
+            <li>
+                <a href="{{ url_for('list_directory', path=current_path + dir + '/') }}">{{ dir }}/</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>파일 목록</h2>
+    <ul>
+        {% for file in files %}
+            <li>
+                <a href="{{ url_for('download_file', filename=current_path + file) }}">{{ file }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>날짜 선택</h2>
+    <form action="/date" method="post">
+        <input type="date" name="date" required>
+        <button type="submit">실행</button>
+    </form>
+</body>
+</html>
