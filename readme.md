@@ -45,7 +45,7 @@ Start Time 04:00 End Time 03:30
 * SSD : 삼성전자 990 Pro M.2 NVME 1T
 * HDD : Western Digital Blue HDD 8TB X2 
 * 램 : 삼성전자 DDR5-5600(32GB) X2
-* 그래픽 : RTX A4000
+* 그래픽 : T 400
 * 마더보드 : MSI PRO Z790-A 맥스 WIFI
 * 파워 : 시소닉 NEW FOCUS GX-850 GOLD 풀모듈러 ATX3.0 
 * 케이스 : 2MONS 서버 4U TRAY D450

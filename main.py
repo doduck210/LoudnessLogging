@@ -235,8 +235,13 @@ def sdiMain(scheduleDir,audioDir,outputDir,chnlName, date="YYYY-MM-DD", outputAu
 
 if __name__=="__main__":
     try:
-        #main('SBS-HD-NAMSAN')
-        #main('SBS-UHD')
+        main('SBS-HD-NAMSAN')
+
+        try:
+            date=sys.argv[1]
+        except:
+            date="YYYY-MM-DD"
+
         sdiMain(
             scheduleDir='/mnt/raid/schedule/'
             ,audioDir='/mnt/jungbi'
@@ -244,21 +249,12 @@ if __name__=="__main__":
             ,chnlName='CleanPGM'
             ,outputAudioDir='/mnt/raid/audio'
             )
-        #spaceClearing.videoClearing()
-        #spaceClearing.logClearing()
-        '''
-        try:
-            before=int(sys.argv[1])
-            today=datetime.now()
-            if before>=50 or before<0:
-                print("Audio are archived only for 50 days")
-                os._exit(0)
-            today=today-timedelta(days=before)
-        except:
-            print("No input detected. Default is yesterday")
-        '''
+        
+        spaceClearing.videoClearing()
+        spaceClearing.logClearing()
+
     except KeyboardInterrupt:
         pass
     except Exception:
         print(traceback.format_exc())
-        #utils.sendEmail(traceback.format_exc())
+        utils.sendEmail(traceback.format_exc())

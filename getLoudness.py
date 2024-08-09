@@ -14,7 +14,7 @@ def splitAndLoud(file_path,start_time,duration):
     fileName="/home/logger/Documents/LoudnessLogging/data/"+str(start_time)+"tmpWav.wav"
     subprocess.run(['ffmpeg','-i',file_path,'-ss',str(start_time),'-t',str(duration),'-c','copy',fileName],stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     lufs, mlkfs = getLoudness(fileName)
-    #os.remove(fileName)
+    os.remove(fileName)
     return lufs, mlkfs
 
 
