@@ -35,6 +35,8 @@ def logClearing():
     logOldStandard = datetime.date.today() - datetime.timedelta(days=180)
 
     for files in os.listdir(logDir):
+        if not files.endswith(".log"):
+            continue
         fileDateStr = files[:-4].split('-')
         logDate = datetime.date( int(fileDateStr[0]), int(fileDateStr[1]), int(fileDateStr[2]))
         if logDate < logOldStandard :

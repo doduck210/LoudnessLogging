@@ -6,7 +6,7 @@
     <title>Loudness Logger</title>
 </head>
 <body>
-    <h1>Loudness Logger</h1>
+    <h1>Ducky's Loudness Logger</h1>
     <h2>현재 경로: {{ current_path }}</h2>
     
     <h2>디렉토리 목록</h2>
@@ -27,10 +27,16 @@
         {% endfor %}
     </ul>
 
-    <h2>날짜 선택</h2>
+    <h2>날짜 선택 및 Loudness 재계산</h2>
     <form action="/date" method="post">
         <input type="date" name="date" required>
         <button type="submit">실행</button>
     </form>
+    <h2>주요 링크</h2>
+    <ul>
+        <li>편성 파일 : <a href="{{ url_for('list_directory', path='schedule') }}">schedule</a></li>
+        <li>데이터 파일 : <a href="{{ url_for('list_directory', path='data') }}">data</a></li>
+        <li>오디오 파일 : <a href="{{ url_for('list_directory', path='audio') }}">audio</a></li>
+    </ul>
 </body>
 </html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>진행 상태</title>
+    <script>
+        function startStream() {
+            const eventSource = new EventSource('/stream');
+            eventSource.onmessage = function(event) {
+                const outputDiv = document.getElementById('output');
+                outputDiv.innerHTML += event.data + '<br>';
+                outputDiv.scrollTop = outputDiv.scrollHeight;  // 자동 스크롤
+            };
+        }
+        window.onload = startStream;
+    </script>
+</head>
+<body>
+    <h1>진행 상태</h1>
+    <div id="output" style="height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;"></div>
+    <button id="backButton" onclick="location.href='/'">메인 페이지로 돌아가기</button>
+</body>
+</html>

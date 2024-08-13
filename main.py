@@ -248,6 +248,7 @@ if __name__=="__main__":
             ,outputDir='/mnt/raid/data'
             ,chnlName='CleanPGM'
             ,outputAudioDir='/mnt/raid/audio'
+            ,date=date
             )
         
         spaceClearing.videoClearing()
