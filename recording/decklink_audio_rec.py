@@ -51,26 +51,6 @@ def on_new_buffer(sink):
     return Gst.FlowReturn.OK
 
 
-
-
-def thread_write():
-    global q, q_flush
-    q_flush = False
-    print('save queue...')
-    result = q.get()
-    while (q.qsize() > 3):
-        result = np.concatenate((result, q.get()))
-    print(f'result size = {len(result)}')
-    
-    with wave.open(f'output_{time.strftime("%H%M%S")}.wav', mode="wb") as wav_file:
-        wav_file.setnchannels(8)
-        wav_file.setsampwidth(2)
-        wav_file.setframerate(48000)
-        wav_file.writeframes(result.tobytes())
-
-    q_flush = True
-
-
 def queue_write():
     global q, q_flush, wa
     q_flush = False
@@ -134,7 +114,7 @@ q_flush = True
 wa = wave_append_writer((2, 8, 48000))
 wa.update_tick(time.strftime("%M"))
 
-pipe = "decklinkvideosrc ! fakesink decklinkaudiosrc channels=8 ! appsink name=audiosink"
+pipe = "decklinkvideosrc device-number=2 ! fakesink decklinkaudiosrc device-number=2 channels=8 ! appsink name=audiosink"
 Gst.init()
 pipeline = Gst.parse_launch(pipe)
 
@@ -158,9 +138,6 @@ try:
         if (message.type != Gst.MessageType.STATE_CHANGED):
             print(message.type, message.src)
         wa.update_tick(time.strftime("%M"))
-        #if ((q.qsize() > 50) and q_flush):
-        #    threading.Thread(target=thread_write).start()
-        #    time.sleep(0.1)
         if q.qsize():
             queue_write()
         time.sleep(0.01)

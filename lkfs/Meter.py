@@ -147,7 +147,6 @@ class Meter(object):
 
         G = [1.0, 1.0, 1.0, 1.41, 1.41] # channel gains
         T_g = self.block_size # 400 ms gating block standard
-        Gamma_a = -70.0 # -70 LKFS = absolute loudness threshold
         overlap = 0.75 # overlap of 75% of the block duration
         step = 1.0 - overlap # step size by percentage
 
@@ -166,31 +165,9 @@ class Meter(object):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             # loudness for each jth block (see eq. 4)
-            l = [-0.691 + 10.0 * np.log10(np.sum([G[i] * z[i,j] for i in range(numChannels)])) for j in j_range]
-            mlkfs=l
+            mlkfs = -0.691 + 10.0 * np.log10(np.sum([G[i] * z[i,0] for i in range(numChannels)]))
 
-        # find gating block indices above absolute threshold
-        J_g = [j for j,l_j in enumerate(l) if l_j >= Gamma_a]
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RuntimeWarning)
-            # calculate the average of z[i,j] as show in eq. 5
-            z_avg_gated = [np.mean([z[i,j] for j in J_g]) for i in range(numChannels)]
-        # calculate the relative threshold value (see eq. 6)
-        Gamma_r = -0.691 + 10.0 * np.log10(np.sum([G[i] * z_avg_gated[i] for i in range(numChannels)])) - 10.0
-
-        # find gating block indices above relative and absolute thresholds  (end of eq. 7)
-        J_g = [j for j,l_j in enumerate(l) if (l_j > Gamma_r and l_j > Gamma_a)]
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RuntimeWarning)
-            # calculate the average of z[i,j] as show in eq. 7 with blocks above both thresholds
-            z_avg_gated = np.nan_to_num(np.array([np.mean([z[i,j] for j in J_g]) for i in range(numChannels)]))
-
-        # calculate final loudness gated loudness (see eq. 7)
-        with np.errstate(divide='ignore'):
-            LUFS = -0.691 + 10.0 * np.log10(np.sum([G[i] * z_avg_gated[i] for i in range(numChannels)]))
-
-        return LUFS, mlkfs
+        return mlkfs
 
     @property
     def filter_class(self):
