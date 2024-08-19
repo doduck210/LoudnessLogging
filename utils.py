@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import password
 
 # 폴더 내의 모든 mp4 파일을 찾아서 리스트로 반환
 def find_ts_files(directory):
@@ -81,9 +82,7 @@ def audioExistCheck(audioDir,scheduleStart:datetime,scheduleEnd:datetime):
 def sendEmail(error_message):
     sender_email="duck@yonsei.ac.kr"
     receiver_email="duck@sbs.co.kr"
-    f=open("/home/logger/Documents/LoudnessLogging/password","r")
-    app_password=f.read()
-    f.close()
+    app_password=password.PASSWORD
 
     subject="Loudness Logger 에러 알림"
     text="Loudness Logger가 정상적으로 실행되지 못했습니다. 류덕형 혹은 정비실에 연락 부탁드립니다."
