@@ -53,7 +53,7 @@ def thread_write():
     chL=result[0::8]
     chR=result[1::8]
     samples=np.column_stack((chL,chR))
-    samples=samples/32768.0 # wav는 -1과 1사이 값 가짐
+    samples=samples/32768.0 # -1과 1사이 값으로
     block=np.vstack((block,samples))
     
     if block.shape[0] >= 19200:

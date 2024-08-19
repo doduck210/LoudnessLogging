@@ -15,6 +15,8 @@ from gi.repository import Gst, GObject
 
 #  https://gist.github.com/orig74/de52f3a85924eadee3d3a84d9e164f47
 
+decklinkIdx = "2"
+savingPath="mnt/raid/video/SBS_HD" #os.getcwd()
 
 def get_buffer(name):
     global pipeline
@@ -89,7 +91,7 @@ class wave_append_writer:
             
             
     def prepare_pt_wave(self):
-        name_file =  os.path.join(os.getcwd(), time.strftime("%Y-%m-%d_%H.%M.%S") + ".wav")
+        name_file =  os.path.join(savingPath, time.strftime("%Y-%m-%d_%H.%M.%S") + ".wav")
         
         self.filename = name_file
         print(name_file)
@@ -106,7 +108,6 @@ class wave_append_writer:
     def close_wave(self):
         self.pt_wave.close() 
 
-
 q = queue.Queue()
 q_flush = True
 
@@ -114,7 +115,7 @@ q_flush = True
 wa = wave_append_writer((2, 8, 48000))
 wa.update_tick(time.strftime("%M"))
 
-pipe = "decklinkvideosrc device-number=2 ! fakesink decklinkaudiosrc device-number=2 channels=8 ! appsink name=audiosink"
+pipe = "decklinkvideosrc device-number=" + decklinkIdx + " ! fakesink decklinkaudiosrc device-number="+ decklinkIdx +" channels=8 ! appsink name=audiosink"
 Gst.init()
 pipeline = Gst.parse_launch(pipe)
 
