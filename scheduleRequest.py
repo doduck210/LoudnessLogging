@@ -39,4 +39,4 @@ def scheduleRequest(savingPath,date="YYYY-MM-DD"):
     tree.write(os.path.join(savingPath, filename), encoding="utf8")
 
 if __name__ == "__main__" : 
-    scheduleRequest("/mnt/raid","2013-07-01")
+    scheduleRequest("/mnt/raid/schedule")
