@@ -146,6 +146,8 @@ if __name__=="__main__":
             ,date=date
             )
         
+        spaceClearing.serverClearing()
+
     except KeyboardInterrupt:
         pass
     except Exception:
