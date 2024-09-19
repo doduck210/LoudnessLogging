@@ -1,5 +1,5 @@
 from flask import Flask, request, send_from_directory, render_template, redirect, url_for, Response
-import os, threading, time, sys
+import os, threading, time, sys, shutil
 import main
 
 app = Flask(__name__)
@@ -37,6 +37,32 @@ def list_directory(path):
 @app.route('/download/<path:filename>')
 def download_file(filename):
     return send_from_directory(BASE_DIR, filename, as_attachment=True)
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return "파일이 없습니다.", 400
+    file = request.files['file']
+    if file.filename == '':
+        return "파일 이름이 없습니다.", 400
+    
+    # 현재 경로를 가져옵니다.
+    current_path = request.form.get('current_path', '')
+    full_upload_path = os.path.join(BASE_DIR, current_path, file.filename)
+    
+    file.save(full_upload_path)
+    return redirect(url_for('list_directory', path=current_path))
+
+@app.route('/delete_dir/<path:dirname>', methods=['POST'])
+def delete_directory(dirname):
+    dir_path = os.path.join(BASE_DIR, dirname)
+    try:
+        shutil.rmtree(dir_path)  # 디렉토리와 그 안의 모든 내용을 삭제
+        return redirect(url_for('list_directory', path='audio/'))
+    except FileNotFoundError:
+        return "디렉토리를 찾을 수 없습니다.", 404
+    except Exception as e:
+        return f"오류 발생: {str(e)}", 400
 
 @app.route('/date', methods=['POST'])
 def run_script():
