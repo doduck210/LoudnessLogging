@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML 수정</title>
+</head>
+<body>
+    <h1>XML 수정</h1>
+    <form action="{{ url_for('save_xml', filename=filename) }}" method="post">
+        <textarea name="xml_content" rows="20" cols="80">{{ xml_content }}</textarea><br>
+        <input type="submit" value="저장">
+    </form>
+    <a href="{{ url_for('list_directory', path='schedule') }}">뒤로 가기</a>
+</body>
+</html>

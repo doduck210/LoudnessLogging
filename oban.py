@@ -1,6 +1,8 @@
 from flask import Flask, request, send_from_directory, render_template, redirect, url_for, Response
-import os, threading, time, sys, shutil
+import os, threading, time, sys, shutil, re
 import main
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 
 app = Flask(__name__)
 
@@ -75,6 +77,31 @@ def run_script():
     thread.start()
 
     return redirect(url_for('status'))
+
+@app.route('/view_xml/<path:filename>')
+def view_xml(filename):
+    full_path = os.path.join(BASE_DIR, filename)
+    xml_content = read_xml_file(full_path)
+    return render_template('edit_xml.html', xml_content=xml_content, filename=filename)
+
+@app.route('/save_xml/<path:filename>', methods=['POST'])
+def save_xml(filename):
+    xml_data = request.form['xml_content']
+    full_path = os.path.join(BASE_DIR, filename)
+    
+    with open(full_path, 'w', encoding='utf-8') as f:
+        f.write(xml_data)
+    
+    return redirect(url_for('list_directory', path='schedule'))
+
+def read_xml_file(filepath):
+    tree = ET.parse(filepath,ET.XMLParser(encoding="utf-8"))
+    root = tree.getroot()
+    xml_str = ET.tostring(root, encoding='utf-8').decode('utf-8')
+    if bool(re.search(r'\n\s*<', xml_str)):
+        return xml_str
+    pretty_xml_str = minidom.parseString(xml_str).toprettyxml(indent="    ")
+    return pretty_xml_str
 
 def run_sdi_main(selected_date):
     global output_lines

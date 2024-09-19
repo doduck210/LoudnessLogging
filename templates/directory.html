@@ -32,7 +32,11 @@
     <ul>
         {% for file in files %}
             <li>
-                <a href="{{ url_for('download_file', filename=current_path + file) }}">{{ file }}</a>
+                {% if file.endswith('.xml') %}
+                    <a href="{{ url_for('view_xml', filename=current_path + file) }}">{{ file }}</a>
+                {% else %}
+                    <a href="{{ url_for('download_file', filename=current_path + file) }}">{{ file }}</a>
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
@@ -46,9 +50,22 @@
 
     <h2>날짜 선택 및 Loudness 재계산</h2>
     <form action="/date" method="post">
-        <input type="date" name="date" required>
+        <input type="date" name="date" id="dateInput" required>
         <button type="submit">실행</button>
     </form>
+    <script>
+        const today = new Date();
+        today.setDate(today.getDate()-1);
+        
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const yyyy = today.getFullYear();
+
+        const currentDate = `${yyyy}-${mm}-${dd}`;
+        
+        // 날짜 입력 필드의 최소값을 오늘로 설정
+        document.getElementById('dateInput').setAttribute('max', currentDate);
+    </script>
     <h2>주요 링크</h2>
     <ul>
         <li>편성 파일 : <a href="{{ url_for('list_directory', path='schedule') }}">schedule</a></li>
