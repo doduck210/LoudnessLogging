@@ -118,7 +118,7 @@ def programLoudness(inputDir, startTime, endTime, correctionTime=0, save=True, o
         sys.exit(1)
     
 if __name__ == "__main__":
-    file = 'original.wav'
+    file = '/mnt/raid/audio/2024-09-07/CleanPGM_45_13-48-04.wav'
     data, rate = sf.read(file=file)
     data=data[:,0:2]
     meter=lkfs.Meter(rate)

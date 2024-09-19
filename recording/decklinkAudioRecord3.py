@@ -16,7 +16,7 @@ from gi.repository import Gst, GObject
 #  https://gist.github.com/orig74/de52f3a85924eadee3d3a84d9e164f47
 
 decklinkIdx = "3"
-savingPath="mnt/raid/video/SBS_HD" #os.getcwd()
+savingPath="/mnt/raid/video/SBS_HD" #os.getcwd()
 
 def get_buffer(name):
     global pipeline

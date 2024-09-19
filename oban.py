@@ -64,7 +64,7 @@ def run_sdi_main(selected_date):
 
     main.sdiMain(
         scheduleDir='/mnt/raid/schedule/',
-        audioDir='/mnt/jungbi',
+        audioDir='/mnt/raid/recording/SBS_HD',
         outputDir='/mnt/raid/data',
         chnlName='CleanPGM',
         outputAudioDir='/mnt/raid/audio',
