@@ -138,11 +138,11 @@ if __name__=="__main__":
             date="YYYY-MM-DD"
 
         sdiMain(
-            scheduleDir='/mnt/raid/schedule/'
-            ,audioDir='/mnt/raid/recording/SBS_HD'#'/mnt/jungbi'
-            ,outputDir='/mnt/raid/data'
+            scheduleDir='D:/schedule/'
+            ,audioDir='D:/recording/SBS_HD'#'/mnt/jungbi'
+            ,outputDir='D:/data'
             ,chnlName='CleanPGM'
-            ,outputAudioDir='/mnt/raid/audio'
+            ,outputAudioDir='D:/audio'
             ,date=date
             )
         

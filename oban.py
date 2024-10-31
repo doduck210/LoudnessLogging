@@ -6,7 +6,7 @@ from xml.dom import minidom
 
 app = Flask(__name__)
 
-BASE_DIR = '/mnt/raid'
+BASE_DIR = 'D:'
 output_lines=[]
 
 def get_files_and_dirs(path):
@@ -116,11 +116,11 @@ def run_sdi_main(selected_date):
     sys.stdout = StreamToList()
 
     main.sdiMain(
-        scheduleDir='/mnt/raid/schedule/',
-        audioDir='/mnt/raid/recording/SBS_HD',
-        outputDir='/mnt/raid/data',
+        scheduleDir=BASE_DIR+'/schedule/',
+        audioDir=BASE_DIR+'/recording/SBS_HD',
+        outputDir=BASE_DIR+'/data',
         chnlName='CleanPGM',
-        outputAudioDir='/mnt/raid/audio',
+        outputAudioDir=BASE_DIR+'/audio',
         date=selected_date
     )
 
