@@ -60,6 +60,7 @@ def sdiMain(scheduleDir,audioDir,outputDir,chnlName, date="YYYY-MM-DD", outputAu
     scheduleEnd = datetime.strptime(f"{EventList[-1][1].text} {EventList[-1][2].text[:-3]}","%d/%m/%Y %H:%M:%S")
     if not utils.audioExistCheck(audioDir,scheduleStart,scheduleEnd):
         print("No recorded audio files maching with schedule")
+        utils.sendEmail("No recorded audio files maching with schedule")
         sys.exit(1)
 
     # Excel Report File
