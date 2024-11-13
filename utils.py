@@ -85,7 +85,7 @@ def sendEmail(error_message):
     app_password=password.PASSWORD
 
     subject="Loudness Logger 에러 알림"
-    text="Loudness Logger가 정상적으로 실행되지 못했습니다. 류덕형 혹은 정비실에 연락 부탁드립니다."
+    text="Loudness Logger가 정상적으로 실행되지 못했습니다. 류덕형 혹은 정비실에 연락 바랍니다."
     text+="<br><br>Error Message : <br>"
     text+=error_message
     html=f"<html><body><p>{text}</p></body></html>"
